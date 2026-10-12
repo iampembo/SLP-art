@@ -1,0 +1,30 @@
+---
+import { formatAUD, toCents } from '../lib/money';
+
+interface Variant { name: string; priceDelta: number }
+interface Props {
+  id: string;
+  title: string;
+  type: 'original' | 'print';
+  priceAUD: number;
+  status: 'available' | 'sold';
+  image: string;
+  url: string;
+  variants?: Variant[];
+}
+const { title, type, priceAUD, status, image, url } = Astro.props;
+const sold = status === 'sold';
+---
+<a href={url} class="block overflow-hidden rounded border border-stone-200 bg-white">
+  <img src={image} alt={title} class="aspect-[4/3] w-full object-cover" loading="lazy" />
+  <div class="p-4">
+    <div class="flex items-center justify-between text-xs">
+      <span class:list={['rounded px-2 py-0.5', type === 'original' ? 'bg-amber-100 text-amber-900' : 'bg-sky-100 text-sky-900']}>
+        {type === 'original' ? '1-of-1 Original' : 'Made-to-order print'}
+      </span>
+      {sold && <span class="rounded bg-stone-900 px-2 py-0.5 text-white">Sold</span>}
+    </div>
+    <h2 class="mt-2 font-semibold">{title}</h2>
+    <p class="mt-1 text-sm text-stone-600">{formatAUD(toCents(priceAUD))} AUD</p>
+  </div>
+</a>
