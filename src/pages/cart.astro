@@ -1,0 +1,113 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+// Embedded at build so the client can price/render cart lines.
+// Server re-validates everything at checkout — this map is display-only.
+const products = await getCollection('products');
+const catalogue = Object.fromEntries(
+  products.map((p) => [
+    p.data.id,
+    {
+      title: p.data.title,
+      type: p.data.type,
+      priceAUD: p.data.priceAUD,
+      status: p.data.status,
+      image: p.data.image,
+      url: p.data.url,
+      variants: p.data.variants ?? [],
+    },
+  ]),
+);
+---
+<BaseLayout title="Cart — SLP-art">
+  <h1 class="text-2xl font-bold">Cart</h1>
+  <div id="cart-lines" class="mt-4 space-y-3"></div>
+  <p id="cart-total" class="mt-4 text-lg font-semibold"></p>
+  <p id="cart-error" class="mt-2 text-sm text-red-700"></p>
+  <div class="mt-4 flex gap-3">
+    <button id="checkout-btn" class="rounded bg-stone-900 px-4 py-2 text-sm text-white">
+      Check out with Stripe
+    </button>
+    <a href="/shop" class="rounded border border-stone-300 px-4 py-2 text-sm">Keep browsing</a>
+  </div>
+  <p class="mt-4 text-sm text-stone-500">AU shipping address collected at Stripe checkout. Prices in AUD.</p>
+  <script id="catalogue" type="application/json" set:html={JSON.stringify(catalogue)} />
+</BaseLayout>
+
+<script>
+  import { $cart, cartTotalCents, clearCart, removeFromCart } from '../lib/cart';
+  import { formatAUD, toCents } from '../lib/money';
+
+  const catalogue = JSON.parse(document.querySelector('#catalogue')?.textContent ?? '{}');
+  const lines = document.querySelector('#cart-lines')!;
+  const totalEl = document.querySelector('#cart-total')!;
+  const errEl = document.querySelector('#cart-error')!;
+  const btn = document.querySelector<HTMLButtonElement>('#checkout-btn')!;
+
+  const unitCents = (id: string, variant?: string) => {
+    const p = catalogue[id];
+    if (!p) return 0;
+    const delta = variant ? (p.variants.find((v: any) => v.name === variant)?.priceDelta ?? 0) : 0;
+    return toCents(p.priceAUD + delta);
+  };
+
+  function render() {
+    const items = $cart.get();
+    errEl.textContent = '';
+    if (!items.length) {
+      lines.innerHTML = '<p class="text-stone-500 text-sm">Your cart is empty.</p>';
+      totalEl.textContent = '';
+      btn.disabled = true;
+      return;
+    }
+    btn.disabled = false;
+    lines.innerHTML = '';
+    for (const i of items) {
+      const p = catalogue[i.id];
+      const row = document.createElement('div');
+      row.className = 'flex items-center justify-between rounded border border-stone-200 bg-white p-3 text-sm';
+      row.innerHTML = `<span><strong></strong> <span class="text-stone-500"></span> <span></span></span>`;
+      row.querySelector('strong')!.textContent = p?.title ?? i.id;
+      row.querySelector('.text-stone-500')!.textContent = i.variant ? `— ${i.variant}` : '';
+      row.querySelector('span:last-child')!.textContent = '';
+      const right = document.createElement('span');
+      right.textContent = `× ${i.qty} · ${formatAUD(unitCents(i.id, i.variant) * i.qty)}`;
+      const rm = document.createElement('button');
+      rm.className = 'ml-3 underline text-stone-500';
+      rm.textContent = 'Remove';
+      rm.addEventListener('click', () => removeFromCart(i.id, i.variant));
+      row.append(right, rm);
+      lines.append(row);
+    }
+    totalEl.textContent = `Total: ${formatAUD(cartTotalCents(items, (i) => unitCents(i.id, i.variant)))} AUD`;
+  }
+  $cart.subscribe(render); render();
+
+  btn.addEventListener('click', async () => {
+    errEl.textContent = '';
+    btn.disabled = true;
+    btn.textContent = 'Redirecting…';
+    try {
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ items: $cart.get() }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        errEl.textContent = data.error === 'SOLD_OUT'
+          ? `Sorry — ${data.detail ?? 'an item just sold.'} Remove it to continue.`
+          : `Checkout failed (${data.error ?? res.status}). Try again.`;
+        if (data.error === 'SOLD_OUT') render();
+        return;
+      }
+      window.location.href = data.url;
+    } catch {
+      errEl.textContent = 'Network error. Try again.';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Check out with Stripe';
+    }
+  });
+</script>

@@ -10,14 +10,17 @@
     "build": "astro build",
     "preview": "astro preview",
     "test": "vitest run",
-    "astro": "astro"
+    "astro": "astro",
+    "generate-types": "wrangler types"
   },
   "dependencies": {
+    "@astrojs/cloudflare": "^14.3.4",
     "@tailwindcss/vite": "^4.3.3",
     "astro": "^7.3.8",
     "nanostores": "^1.5.5",
     "stripe": "^23.0.0",
-    "tailwindcss": "^4.3.3"
+    "tailwindcss": "^4.3.3",
+    "wrangler": "^4.149.0"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
