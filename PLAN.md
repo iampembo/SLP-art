@@ -84,7 +84,7 @@ npm run dev
 ```
 Done when: server is source of truth, client total ignored.
 
-### Phase 3 — Webhook + sold flip [~] (endpoint live + signed-e2e green; email needs NOTIFY_EMAIL + RESEND_API_KEY; sold-flag still manual via file)
+### Phase 3 — Webhook + sold flip [~] (endpoint live + signed-e2e green; DECISION: Stripe Dashboard payment notifications instead of Resend — resend path stays dormant/env-gated; sold-flag still manual via file)
 Tasks:
 - [ ] `src/pages/api/webhook.ts`: verify `stripe-signature` with `STRIPE_WEBHOOK_SECRET`,
   handle `checkout.session.completed`: log order, email mum (Resend for MVP), flag original sold
