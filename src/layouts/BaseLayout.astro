@@ -1,0 +1,33 @@
+---
+import '../styles/global.css';
+interface Props {
+  title?: string;
+}
+const { title = 'SLP-art — Australian Art Shop' } = Astro.props;
+---
+<html lang="en-AU">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+  </head>
+  <body class="min-h-screen bg-stone-50 text-stone-900 antialiased">
+    <header class="border-b border-stone-200">
+      <nav class="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
+        <a href="/" class="text-lg font-bold tracking-tight">SLP-art</a>
+        <div class="flex gap-4 text-sm">
+          <a href="/shop" class="hover:underline">Shop</a>
+          <a href="/about" class="hover:underline">About</a>
+        </div>
+      </nav>
+    </header>
+    <main class="mx-auto max-w-5xl px-4 py-8">
+      <slot />
+    </main>
+    <footer class="mx-auto max-w-5xl px-4 py-8 text-sm text-stone-500">
+      Prices in AUD. AU shipping only for MVP.
+    </footer>
+  </body>
+</html>
