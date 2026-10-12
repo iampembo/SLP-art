@@ -2,6 +2,7 @@ export const prerender = false;
 
 import Stripe from 'stripe';
 import { getCollection } from 'astro:content';
+import { env as cfEnv } from 'cloudflare:workers';
 import { displayName, unitAmountCents } from '../../lib/pricing';
 
 interface IncomingItem {
@@ -19,19 +20,16 @@ function bad(status: number, error: string, detail?: string): Response {
 
 export async function POST({
   request,
-  locals,
 }: {
   request: Request;
-  locals: unknown;
 }): Promise<Response> {
-  // On Cloudflare Workers, secrets live in runtime env (dashboard Secrets),
-  // not build-time import.meta.env. Fall back to import.meta.env for `npm run dev`.
-  const runtimeEnv = (locals as { runtime?: { env?: Record<string, string> } })
-    ?.runtime?.env;
-  const env = (k: string): string | undefined =>
-    runtimeEnv?.[k] ?? (import.meta.env as Record<string, string | undefined>)[k];
-  const secret = env('STRIPE_SECRET_KEY');
-  const site = env('PUBLIC_SITE_URL') ?? new URL(request.url).origin;
+  // Secrets come from the Worker runtime (dashboard Secrets / .dev.vars locally).
+  // Fall back to build-time import.meta.env for plain `astro dev`.
+  const cf = cfEnv as Record<string, string | undefined>;
+  const build = import.meta.env as Record<string, string | undefined>;
+  const secret = cf.STRIPE_SECRET_KEY ?? build.STRIPE_SECRET_KEY;
+  const site =
+    cf.PUBLIC_SITE_URL ?? build.PUBLIC_SITE_URL ?? new URL(request.url).origin;
   if (!secret) {
     return bad(500, 'NOT_CONFIGURED', 'Missing STRIPE_SECRET_KEY');
   }
