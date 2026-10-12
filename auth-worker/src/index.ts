@@ -39,7 +39,15 @@ async function handleCallback(
 ): Promise<Response> {
   const url = new URL(request.url);
   const code = url.searchParams.get('code');
-  if (!code) return new Response('Missing code', { status: 400 });
+  const err = url.searchParams.get('error');
+  if (err) {
+    console.log(`oauth callback error param: ${err}`);
+    return new Response(`GitHub said: ${err}`, { status: 400 });
+  }
+  if (!code) {
+    console.log('oauth callback hit with no code');
+    return new Response('Missing code', { status: 400 });
+  }
   if (!env.CLIENT_ID || !env.CLIENT_SECRET) {
     return new Response('Missing CLIENT_ID/CLIENT_SECRET', { status: 500 });
   }
@@ -52,13 +60,18 @@ async function handleCallback(
       code,
     }),
   });
-  if (!res.ok) return new Response('Token exchange failed', { status: 502 });
+  if (!res.ok) {
+    console.log(`token exchange HTTP ${res.status}`);
+    return new Response('Token exchange failed', { status: 502 });
+  }
   const data = (await res.json()) as { access_token?: string; error?: string };
   if (!data.access_token) {
+    console.log(`token exchange denied: ${data.error ?? 'unknown'}`);
     return new Response(`Token exchange failed: ${data.error ?? 'unknown'}`, {
       status: 502,
     });
   }
+  console.log('token exchange ok');
   // Tokens are [a-z0-9_]+ — safe to embed, but escape anyway.
   const token = data.access_token.replace(/[^a-zA-Z0-9_]/g, '');
   const html = `<!doctype html><html><body><script>
