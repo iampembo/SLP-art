@@ -2,8 +2,14 @@
 import '../styles/global.css';
 interface Props {
   title?: string;
+  description?: string;
+  noindex?: boolean;
 }
-const { title = 'SLP-art — Australian Art Shop' } = Astro.props;
+const {
+  title = 'Steph Pemberton Art | Original Oil Paintings & Prints Australia',
+  description = 'Original oil and mixed media paintings and made-to-order prints by Steph Pemberton. Art that empowers, brings beauty, and feeds the soul. Ships Australia-wide.',
+  noindex = false,
+} = Astro.props;
 ---
 <html lang="en-AU">
   <head>
@@ -12,11 +18,13 @@ const { title = 'SLP-art — Australian Art Shop' } = Astro.props;
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
+    <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
   </head>
   <body class="min-h-screen bg-stone-50 text-stone-900 antialiased">
     <header class="border-b border-stone-200">
       <nav class="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
-        <a href="/" class="text-lg font-bold tracking-tight">SLP-art</a>
+        <a href="/" class="text-lg font-bold tracking-tight">Steph Pemberton Art</a>
         <div class="flex gap-4 text-sm">
           <a href="/shop" class="hover:underline">Shop</a>
           <a href="/about" class="hover:underline">About</a>
@@ -28,7 +36,8 @@ const { title = 'SLP-art — Australian Art Shop' } = Astro.props;
       <slot />
     </main>
     <footer class="mx-auto max-w-5xl px-4 py-8 text-sm text-stone-500">
-      Prices in AUD. AU shipping only for MVP.
+      Steph Pemberton Art. Original oil paintings and made-to-order prints from Australia.
+      Prices in AUD. Shipping within Australia.
     </footer>
     <script>
       import { $cart, cartCount } from '../lib/cart';

@@ -1,14 +1,77 @@
 ---
+import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import ProductCard from '../components/ProductCard.astro';
+
+const available = (await getCollection('products')).filter(
+  (p) => p.data.status === 'available',
+);
+const featured = available.slice(0, 3);
 ---
-<BaseLayout title="SLP-art — Original art + made-to-order prints (AU)">
-  <h1 class="text-3xl font-bold tracking-tight">Original art + made-to-order prints</h1>
-  <p class="mt-2 max-w-xl text-stone-600">
-    Small independent Australian art shop. Originals are 1-of-1. Prints are made to order in AUD with AU shipping.
-  </p>
-  <div class="mt-6 flex gap-3">
-    <a href="/shop" class="rounded bg-stone-900 px-4 py-2 text-sm text-white">Browse shop</a>
-    <a href="/about" class="rounded border border-stone-300 px-4 py-2 text-sm">About the artist</a>
-  </div>
-  <p class="mt-8 text-sm text-stone-500">Phase 0 scaffold — catalogue lands in Phase 1.</p>
+<BaseLayout>
+  <section class="py-8">
+    <h1 class="max-w-2xl text-4xl font-bold tracking-tight">Art with soul for your home</h1>
+    <p class="mt-4 max-w-xl text-lg text-stone-600">
+      Steph Pemberton paints in oil and mixed media: layered, textured originals
+      that empower, bring beauty, and feed the soul.
+    </p>
+    <div class="mt-6 flex gap-3">
+      <a href="/shop" class="rounded bg-stone-900 px-5 py-2.5 text-sm text-white">Browse the collection</a>
+      <a href="/about" class="rounded border border-stone-300 px-5 py-2.5 text-sm">Meet Steph</a>
+    </div>
+  </section>
+
+  {featured.length > 0 && (
+    <section class="mt-8">
+      <div class="flex items-baseline justify-between">
+        <h2 class="text-xl font-semibold">Recent work</h2>
+        <a href="/shop" class="text-sm underline">See everything</a>
+      </div>
+      <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {featured.map((p) => <ProductCard {...p.data} />)}
+      </div>
+    </section>
+  )}
+
+  <section class="mt-12">
+    <h2 class="text-xl font-semibold">Why collectors choose Steph's work</h2>
+    <div class="mt-4 grid gap-4 md:grid-cols-3">
+      <div class="rounded border border-stone-200 bg-white p-5">
+        <h3 class="font-semibold">One of one</h3>
+        <p class="mt-1 text-sm text-stone-600">Every original exists once. When it hangs in your home, no one else has it.</p>
+      </div>
+      <div class="rounded border border-stone-200 bg-white p-5">
+        <h3 class="font-semibold">Prints made for your walls</h3>
+        <p class="mt-1 text-sm text-stone-600">Made to order in your choice of size, framed or unframed, so it fits the room it was meant for.</p>
+      </div>
+      <div class="rounded border border-stone-200 bg-white p-5">
+        <h3 class="font-semibold">Painted in Australia</h3>
+        <p class="mt-1 text-sm text-stone-600">Every piece begins in Steph's studio and ships anywhere in Australia.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="mt-12">
+    <h2 class="text-xl font-semibold">How buying works</h2>
+    <ol class="mt-4 grid gap-4 md:grid-cols-3">
+      <li class="rounded border border-stone-200 bg-white p-5">
+        <p class="text-sm font-semibold">1. Choose your piece</p>
+        <p class="mt-1 text-sm text-stone-600">Originals are one of one. Prints are made to order in your size.</p>
+      </li>
+      <li class="rounded border border-stone-200 bg-white p-5">
+        <p class="text-sm font-semibold">2. Check out securely</p>
+        <p class="mt-1 text-sm text-stone-600">Pay by card through Stripe. Your details never touch this site.</p>
+      </li>
+      <li class="rounded border border-stone-200 bg-white p-5">
+        <p class="text-sm font-semibold">3. Hang it and live with it</p>
+        <p class="mt-1 text-sm text-stone-600">Delivery is confirmed by email once your order is on its way.</p>
+      </li>
+    </ol>
+  </section>
+
+  <section class="mt-12 rounded border border-stone-200 bg-white p-8 text-center">
+    <h2 class="text-2xl font-bold tracking-tight">Find the piece your walls have been waiting for</h2>
+    <p class="mx-auto mt-2 max-w-md text-sm text-stone-600">Originals sell once and never return. Start with the collection.</p>
+    <a href="/shop" class="mt-5 inline-block rounded bg-stone-900 px-5 py-2.5 text-sm text-white">Browse the collection</a>
+  </section>
 </BaseLayout>

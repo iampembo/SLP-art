@@ -7,17 +7,22 @@ const products = await getCollection('products');
 const originals = products.filter((p) => p.data.type === 'original');
 const prints = products.filter((p) => p.data.type === 'print');
 ---
-<BaseLayout title="Shop — SLP-art">
-  <h1 class="text-2xl font-bold">Shop</h1>
-  <p class="mt-2 text-sm text-stone-600">Prices in AUD. AU shipping only for MVP. Originals are 1-of-1.</p>
+<BaseLayout
+  title="The Collection | Steph Pemberton Art"
+  description="Browse one-of-one original oil paintings and made-to-order prints by Steph Pemberton. Australian art for your home."
+>
+  <h1 class="text-3xl font-bold tracking-tight">The collection</h1>
+  <p class="mt-2 max-w-xl text-stone-600">Original oil paintings and made-to-order prints. When an original sells, it is gone for good.</p>
 
-  <h2 class="mt-8 text-lg font-semibold">Originals</h2>
-  <div class="mt-3 grid gap-4 sm:grid-cols-2">
+  <h2 class="mt-10 text-xl font-semibold">One-of-one originals</h2>
+  <p class="mt-1 text-sm text-stone-600">Painted once, never repeated. Each original is the only one in existence.</p>
+  <div class="mt-4 grid gap-4 sm:grid-cols-2">
     {originals.map((p) => <ProductCard {...p.data} />)}
   </div>
 
-  <h2 class="mt-8 text-lg font-semibold">Prints (made to order)</h2>
-  <div class="mt-3 grid gap-4 sm:grid-cols-2">
+  <h2 class="mt-10 text-xl font-semibold">Made-to-order prints</h2>
+  <p class="mt-1 text-sm text-stone-600">Printed for your order in your choice of size, framed or unframed.</p>
+  <div class="mt-4 grid gap-4 sm:grid-cols-2">
     {prints.map((p) => <ProductCard {...p.data} />)}
   </div>
 </BaseLayout>
