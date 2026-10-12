@@ -17,11 +17,21 @@ function bad(status: number, error: string, detail?: string): Response {
   });
 }
 
-export async function POST({ request }: { request: Request }): Promise<Response> {
-  const secret = import.meta.env.STRIPE_SECRET_KEY as string | undefined;
-  const site =
-    (import.meta.env.PUBLIC_SITE_URL as string | undefined) ??
-    new URL(request.url).origin;
+export async function POST({
+  request,
+  locals,
+}: {
+  request: Request;
+  locals: unknown;
+}): Promise<Response> {
+  // On Cloudflare Workers, secrets live in runtime env (dashboard Secrets),
+  // not build-time import.meta.env. Fall back to import.meta.env for `npm run dev`.
+  const runtimeEnv = (locals as { runtime?: { env?: Record<string, string> } })
+    ?.runtime?.env;
+  const env = (k: string): string | undefined =>
+    runtimeEnv?.[k] ?? (import.meta.env as Record<string, string | undefined>)[k];
+  const secret = env('STRIPE_SECRET_KEY');
+  const site = env('PUBLIC_SITE_URL') ?? new URL(request.url).origin;
   if (!secret) return bad(500, 'NOT_CONFIGURED', 'Missing STRIPE_SECRET_KEY');
 
   let body: unknown;
