@@ -1,0 +1,6 @@
+# Separate Worker (OAuth proxy for Decap CMS login).
+# Deploy manually: npx wrangler deploy --config auth-worker/wrangler.toml
+# Secrets: CLIENT_ID + CLIENT_SECRET from the GitHub OAuth App.
+name = "slp-art-decap-auth"
+compatibility_date = "2026-10-12"
+main = "src/index.ts"

@@ -1,0 +1,82 @@
+# Decap CMS — mum's product editor. Publishes straight to GitHub (main),
+# which rebuilds the site on Cloudflare. No code, no terminal.
+backend:
+  name: github
+  repo: iampembo/SLP-art
+  branch: main
+  # OAuth proxy worker (deployed separately, secrets live in Cloudflare).
+  base_url: https://slp-art-decap-auth.iamethanpemberton.workers.dev
+  auth_endpoint: auth
+
+# Preview links back to the live shop (editorial workflow is OFF for MVP).
+display_url: https://slp-art.iamethanpemberton.workers.dev
+
+media_folder: public/images
+public_folder: /images
+
+collections:
+  - name: products
+    label: Products
+    folder: src/content/products
+    create: true
+    # Filename comes from the ID field, e.g. test-print-001.md
+    slug: '{{id}}'
+    extension: md
+    format: frontmatter
+    editor:
+      preview: false
+    fields:
+      - label: ID / SKU (lowercase-hyphens, never change after publishing)
+        name: id
+        widget: string
+        pattern: ['^[a-z0-9-]+$', 'Lowercase letters, numbers and hyphens only']
+      - label: Title
+        name: title
+        widget: string
+      - label: Type
+        name: type
+        widget: select
+        options: ['original', 'print']
+        default: print
+      - label: Price (AUD)
+        name: priceAUD
+        widget: number
+        value_type: float
+        min: 1
+      - label: Status
+        name: status
+        widget: select
+        options: ['available', 'sold']
+        default: available
+        hint: Flip an original to SOLD the moment it sells.
+      - label: Photo
+        name: image
+        widget: image
+      - label: Page URL (must be /art/ + the ID above)
+        name: url
+        widget: string
+        pattern: ['^/art/.+', 'Must look like /art/my-painting-id']
+      - label: Stock (originals only — leave 1)
+        name: stock
+        widget: number
+        value_type: int
+        required: false
+        default: 1
+      - label: Variants (prints only — e.g. sizes/frames)
+        name: variants
+        widget: list
+        required: false
+        summary: '{{fields.name}}'
+        fields:
+          - label: Name (e.g. A3 framed)
+            name: name
+            widget: string
+          - label: Extra on top of base price (AUD, 0 if included)
+            name: priceDelta
+            widget: number
+            value_type: float
+            default: 0
+      - label: Description
+        name: body
+        widget: markdown
+        required: false
