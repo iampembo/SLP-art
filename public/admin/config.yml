@@ -56,12 +56,6 @@ collections:
         name: url
         widget: string
         pattern: ['^/art/.+', 'Must look like /art/my-painting-id']
-      - label: Stock (originals only — leave 1)
-        name: stock
-        widget: number
-        value_type: int
-        required: false
-        default: 1
       - label: Variants (prints only — e.g. sizes/frames)
         name: variants
         widget: list
