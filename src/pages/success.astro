@@ -4,4 +4,11 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 <BaseLayout title="Order success — SLP-art">
   <h1 class="text-2xl font-bold">Thank you!</h1>
   <p class="mt-2 text-stone-600">Your Stripe Checkout order succeeded. A confirmation email is on its way.</p>
+  <p class="mt-2 text-sm text-stone-500">Your basket has been cleared.</p>
+  <a href="/shop" class="mt-4 inline-block rounded border border-stone-300 px-4 py-2 text-sm">Keep browsing</a>
 </BaseLayout>
+
+<script>
+  import { clearCart } from '../lib/cart';
+  clearCart();
+</script>

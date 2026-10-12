@@ -49,7 +49,6 @@ export async function POST({
   const byId = new Map(products.map((p) => [p.data.id, p.data]));
 
   const line_items: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
-  const meta: string[] = [];
 
   for (const raw of items as IncomingItem[]) {
     if (
@@ -83,7 +82,6 @@ export async function POST({
       },
       quantity: raw.qty,
     });
-    meta.push(`${product.id}${raw.variant ? `|${raw.variant}` : ''}x${raw.qty}`);
   }
 
   const stripe = new Stripe(secret);
@@ -94,7 +92,8 @@ export async function POST({
     success_url: `${site}/success?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${site}/cancel`,
     shipping_address_collection: { allowed_countries: ['AU'] },
-    metadata: { items: meta.join(',').slice(0, 450) },
+    // Machine-readable cart for the webhook (JSON, not display text).
+    metadata: { cart: JSON.stringify(items).slice(0, 450) },
   });
 
   if (!session.url) return bad(500, 'NOT_CONFIGURED', 'No session URL');

@@ -39,7 +39,7 @@ variants: # prints only
 
 ## 3. TDD-style execution — AI must self-check each phase before advancing
 
-### Phase 0 — Scaffold [x] (this commit)
+### Phase 0 — Scaffold [x] (done, deployed, auto-rebuilds on push)
 - [x] Astro minimal + TypeScript strict + Tailwind, `output: 'static'`
 - [x] BaseLayout, /, /shop, /about, /success, /cancel placeholders
 - [x] `wrangler.jsonc` (assets `./dist`), `.env.example`
@@ -51,7 +51,7 @@ ls dist/index.html dist/shop/index.html
 ```
 Done when: build green, static output only.
 
-### Phase 1 — Catalogue + cart UI [ ]
+### Phase 1 — Catalogue + cart UI [x] (done: collection, fixtures, shop/art/cart pages, 14 vitest)
 Tasks:
 - [ ] Content collection `products` with Zod schema matching §2 + 2 fixtures:
   `test-original-001` (450.00, stock 1), `test-print-001` (85.00 + variants)
@@ -67,7 +67,7 @@ npx vitest run --reporter=verbose
 ```
 Done when: tampered client price cannot change server total (tested in Phase 2).
 
-### Phase 2 — Stripe Checkout, Test mode [ ]
+### Phase 2 — Stripe Checkout, Test mode [x] (done: live-tested, returns Stripe URLs)
 Env: `STRIPE_SECRET_KEY=test_...`, `PUBLIC_SITE_URL=http://localhost:4321`
 Tasks:
 - [ ] `npm i stripe` (server SDK). Never expose secret to client.
@@ -84,7 +84,7 @@ npm run dev
 ```
 Done when: server is source of truth, client total ignored.
 
-### Phase 3 — Webhook + sold flip [ ]
+### Phase 3 — Webhook + sold flip [~] (endpoint live + signed-e2e green; email needs NOTIFY_EMAIL + RESEND_API_KEY; sold-flag still manual via file)
 Tasks:
 - [ ] `src/pages/api/webhook.ts`: verify `stripe-signature` with `STRIPE_WEBHOOK_SECRET`,
   handle `checkout.session.completed`: log order, email mum (Resend for MVP), flag original sold
