@@ -23,3 +23,8 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# agent skills (local dev environment, reinstall via `npx -y skills add cloudflare/skills --skill '*' --yes`)
+.agents/
+.claude/
+skills-lock.json

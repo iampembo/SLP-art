@@ -33,19 +33,7 @@ export async function POST({
   const secret = env('STRIPE_SECRET_KEY');
   const site = env('PUBLIC_SITE_URL') ?? new URL(request.url).origin;
   if (!secret) {
-    // Diagnostic booleans only — never echo values.
-    const hasRuntime = Boolean(
-      (locals as { runtime?: unknown })?.runtime,
-    );
-    const hasBuildKey = Boolean(
-      (import.meta.env as Record<string, string | undefined>)
-        .STRIPE_SECRET_KEY,
-    );
-    return bad(
-      500,
-      'NOT_CONFIGURED',
-      `runtime:${hasRuntime ? 'yes' : 'no'} buildEnv:${hasBuildKey ? 'yes' : 'no'}`,
-    );
+    return bad(500, 'NOT_CONFIGURED', 'Missing STRIPE_SECRET_KEY');
   }
 
   let body: unknown;
